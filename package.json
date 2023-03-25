@@ -1,0 +1,22 @@
+{
+  "name": "unojs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "npx nodemon index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^18.15.9",
+    "@types/ws": "^8.5.4",
+    "node": "^19.8.1",
+    "nodemon": "^2.0.22",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2"
+  }
+}
