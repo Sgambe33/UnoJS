@@ -1,6 +1,20 @@
 import { generateDeck, shuffleDeck } from './card_utils';
 import { CartaColorataNumerata, Carta, CartaColorataNonNumerata, CartaSpeciale } from './classes';
 const fs = require('fs');
+const path = require('path');
+const express = require('express');
+//create express server
+
+const app = express();
+
+app.use(express.static(path.join(__dirname, `public`)));
+app.use("/cards_images", express.static(path.join(__dirname, `cards_images`)))
+
+app.listen(3000, function() {
+    console.log('Listening on port 3000');
+});
+
+
 
 //create websocket server
 import * as WebSocket from 'ws';
@@ -21,9 +35,8 @@ server.on('connection', function(socket: WebSocket) {
   for(let i = 0; i < sockets.length; i++){
     //send file to client
     for( let j = 0; j < 7; j++){
-      console.log(deck[j].immagine);
-      var image = fs.readFileSync(deck[j].immagine);
-      sockets[i].send(image, {binary: true});
+      
+      sockets[i].send(JSON.stringify(deck[j]));
     }
   }
 
