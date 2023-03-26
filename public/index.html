@@ -4,31 +4,134 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      body {
+        background-color: black;
+        overflow: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center; /*centers items on the line (the x-axis by default)*/
+        align-items: center; /*centers items on the cross-axis (y by default)*/
+      }
+      #cartegiocatore {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+      img {
+        display: inline-block;
+        height: 200px;
+      }
+      .rest {
+        margin-left: -70px;
+      }
+      #mazzo, #div-cartacentrale {
+        padding: 10px;
+      }
+    </style>
   </head>
   <body>
+    <!-- Center card -->
+    <div id="mazzo">
+      <img src="http://192.168.1.61:3000/cards_images/back.png" />
+    </div>
+    <div id="div-cartacentrale">
+      <img id="cartacentrale" src="http://192.168.1.61:3000/cards_images/r1.png" colore="red" numero="1" tipo="null"/>
+    </div>
+    <dialog id="myDialog">
+      <form method="dialog">
+        <!-- 4 squares -->
+        <div style="display: flex; justify-content: center;">
+          <div style="background-color: red; width: 100px; height: 100px;" onclick="chgColor(this)"></div>
+          <div style="background-color: blue; width: 100px; height: 100px;" onclick="chgColor(this)"></div>
+          <div style="background-color: green; width: 100px; height: 100px;" onclick="chgColor(this)"></div>
+          <div style="background-color: yellow; width: 100px; height: 100px;" onclick="chgColor(this)"></div>
+        </div>
+    </dialog>
+
+    <!-- Align 7 cards to bottom -->
+    <div id="cartegiocatore"></div>
+
     <script>
-      //connect to websocket
+      const dialog = document.getElementById("myDialog"); 
+      const cartaCentrale = document.getElementById("cartacentrale");
 
       var socket = new WebSocket("ws://192.168.1.61:8080");
-      socket.onopen = function (event) {
-        alert("Connected to server");
-      };
+      socket.onopen = function (event) {};
 
       socket.addEventListener("message", (event) => {
         console.log(event.data);
-        // Create a new Blob object from the binary string
-        const blob = new Blob([event.data], { type: "image/png" });
 
-        // Create a URL for the blob
-        const blobUrl = URL.createObjectURL(blob);
+        let obj = JSON.parse(event.data);
 
-        // Create a new Image object and set its src to the blob URL
-        const img = new Image();
-        img.src = blobUrl;
+        let img = new Image();
+        img.src = "http://192.168.1.61:3000/" + obj["urlImmagine"];
+        img.setAttribute("colore", obj["colore"]);
+
+        if("numero" in obj) img.setAttribute("numero", obj["numero"]);
+        if("tipo" in obj){
+          img.setAttribute("tipo", obj["tipo"]);
+        } else{
+          img.setAttribute("tipo", null);
+        }
+        if("colore" in obj) img.setAttribute("colore", obj["colore"]);
+
+
+        //the first card is not shifted
+        if (document.getElementById("cartegiocatore").childElementCount > 0) {
+          img.className = "rest";
+        }
+
+        img.onclick = function () {
+          console.log(this );
+            
+          if(puoiGiocareCarta(cartaCentrale, this)){
+            cartaCentrale.setAttribute("src", this.getAttribute("src"));
+            cartaCentrale.setAttribute("colore", this.getAttribute("colore"));
+            cartaCentrale.setAttribute("numero", this.getAttribute("numero"));
+            cartaCentrale.setAttribute("tipo", this.getAttribute("tipo"));
+            //remove card from player
+            this.remove();
+          }
+        };
 
         // Add the image to the webpage
-        document.body.appendChild(img);
+        document.getElementById("cartegiocatore").appendChild(img);
       });
+
+      function puoiGiocareCarta(cartaCentrale, cartaGiocatore) {
+        if (cartaGiocatore.getAttribute("colore") !="null" && cartaGiocatore.getAttribute("colore") == cartaCentrale.getAttribute("colore")) {
+          return true;
+        } else if (cartaGiocatore.getAttribute("numero") != "null" && cartaGiocatore.getAttribute("numero") == cartaCentrale.getAttribute("numero")) {
+          return true;
+        } else if (cartaGiocatore.getAttribute("tipo") != "null" && cartaGiocatore.getAttribute("tipo") == cartaCentrale.getAttribute("tipo")) {
+          return true;
+        } else if(cartaGiocatore.getAttribute("colore") == "undefined"){
+          showDialog();
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      function showDialog() { 
+        dialog.show(); 
+      } 
+
+      function closeDialog() { 
+        dialog.close(); 
+      }
+
+      function chgColor(element){
+        cartaCentrale.setAttribute("colore", element.style.backgroundColor);
+        closeDialog();
+      }
     </script>
   </body>
 </html>
