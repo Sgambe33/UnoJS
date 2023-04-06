@@ -1,7 +1,7 @@
 const dialog = document.getElementById("myDialog");
 const cartaCentrale = document.getElementById("cartacentrale");
 let chosenColor = null;
-
+let carteGiocatore = document.getElementById("cartegiocatore");
 console.log("ROOM ID:" + location.search.replace("?room=", ""));
 
 const socket = io();
@@ -16,44 +16,43 @@ socket.on("connect", () => {
     socket.send(JSON.stringify(payload), (err) => {
         console.log(err);
     });
-    console.log(socket);
+    socket.send(JSON.stringify({"method": "requestCards"}), (err) => {
+        console.log(err);
+    });
+
 });
 
-socket.on("data", (event) => {
-    console.log(event.data);
+socket.on("message", (event) => {
+    console.log(event);
 
-    let obj = JSON.parse(event.data);
+    let answer = JSON.parse(event);
 
-    if (obj["method"] === "setPlayerCards") {
-        obj["cards"].forEach(card => {
-            let img = new Image();
-            img.src = "http://localhost:3000/" + card["urlImmagine"];
-            img.setAttribute("colore", card["colore"]);
-
-            if ("numero" in card) img.setAttribute("numero", card["numero"]);
-            if ("tipo" in card) {
-                img.setAttribute("tipo", card["tipo"]);
-            } else {
-                img.setAttribute("tipo", null);
-            }
-            if ("colore" in card) img.setAttribute("colore", card["colore"]);
-
-            if (document.getElementById("cartegiocatore").childElementCount > 0) {
-                img.className = "rest";
-            }
-
-            img.onclick = function () {
-                console.log(this);
-                if (puoiGiocareCarta(cartaCentrale, this)) {
-                    playCard(this);
-                    this.remove();
+    switch (answer.method) {
+        case "setPlayerCards":
+            console.log(answer.cards);
+            answer.cards.forEach(card => {
+                let img = new Image();
+                img.src = "http://localhost:3000/" + card.urlImmagine;
+                img.setAttribute("colore", card.colore);
+                img.setAttribute("numero", card.numero);
+                img.setAttribute("tipo", card.tipo);
+                if (carteGiocatore.childElementCount > 0) {
+                    img.className = "rest";
                 }
-            };
-            // Add the image to the webpage
-            document.getElementById("cartegiocatore").appendChild(img);
-        });
+                img.addEventListener("click", (event) => {
+                    giocaCarta(img);
+                });
+                document.getElementById("cartegiocatore").appendChild(img);
+            });
+            break;
 
-
+        case "setCentralCard":
+            console.log("Setting central card to " + answer.card);
+            cartaCentrale.src = "http://localhost:3000/" + answer.card.urlImmagine;
+            cartaCentrale.setAttribute("colore", answer.card.colore);
+            cartaCentrale.setAttribute("numero", answer.card.numero.toString());
+            cartaCentrale.setAttribute("tipo", answer.card.tipo);
+            break;
     }
 });
 
@@ -62,6 +61,15 @@ socket.on("disconnect", (event) => {
     socket.send(JSON.stringify({"method": "leaveRoom"}));
 });
 
+function giocaCarta(carta) {
+    if (puoiGiocareCarta(cartaCentrale, carta)) {
+        cartaCentrale.src = carta.src;
+        cartaCentrale.setAttribute("colore", carta.getAttribute("colore"));
+        cartaCentrale.setAttribute("numero", carta.getAttribute("numero"));
+        cartaCentrale.setAttribute("tipo", carta.getAttribute("tipo"));
+        carta.remove();
+    }
+}
 function puoiGiocareCarta(cartaCentrale, cartaGiocatore) {
     if (cartaGiocatore.getAttribute("colore") != "null" && cartaGiocatore.getAttribute("colore") == cartaCentrale.getAttribute("colore")) {
         return true;
