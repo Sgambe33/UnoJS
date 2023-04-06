@@ -41,3 +41,24 @@ export class CartaColorataNumerata extends CartaColorata {
         this.numero = numero
     }
 }
+
+export class GameRoom {
+    id: String;
+    players: String[];
+    status: String;
+
+    constructor(id: String, players: String[], status: String) {
+        this.id = id;
+        this.players = players;
+        this.status = status;
+    }
+
+    toJsonObject() {
+        return {
+            id: this.id,
+            players: this.players,
+            status: this.status
+        }
+    }
+
+}
