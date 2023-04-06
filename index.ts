@@ -41,9 +41,6 @@ server.listen(3000, function() {
 
 export let gameRooms: GameRoom[] = [];
 
-let deck: Carta[] = generateDeck();
-deck = shuffleDeck(deck);
-
 //Use socket.io
 io.on('connection', (socket: any) => {
 
@@ -60,12 +57,33 @@ io.on('connection', (socket: any) => {
             if (index != -1) {
               gameRooms[index].players.push(socket.id);
             }
-            console.log(io.sockets.adapter.rooms.get(decodedMsg.roomId));
+            let payload = {
+                "method": "setCentralCard",
+                "card": gameRooms[index].playedCards[0]
+            }
+            socket.send(JSON.stringify(payload));
           } else {
             console.log("A user tried to join an unexisting room: " + decodedMsg.roomId);
             socket.disconnect();
           }
           break;
+        case "requestCards":
+            let room = gameRooms.find((room) => room.players.includes(socket.id));
+
+            if(room){
+                console.log("Sending cards to player "+socket.id + " in room "+room.id);
+                let cards = room.deck.splice(0, 7);
+                let payload = {
+                    "method": "setPlayerCards",
+                    "cards": cards
+                }
+                socket.send(JSON.stringify(payload));
+            }
+            break;
+
+
+
+
       default:
         console.log(decodedMsg);
     }
