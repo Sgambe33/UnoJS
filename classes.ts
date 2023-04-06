@@ -1,44 +1,19 @@
+import { generateDeck, shuffleDeck} from "./card_utils";
+
 export class Carta {
     urlImmagine: String;
-    constructor(urlImmagine: String) {
-        this.urlImmagine = urlImmagine
+    colore: String;
+    tipo: String;
+    numero: Number;
+
+    constructor(tipo: String, colore: String,urlImmagine: String, numero: Number) {
+        this.urlImmagine = urlImmagine;
+        this.colore = colore;
+        this.tipo = tipo;
+        this.numero = numero;
     }
     get immagine() {
         return this.urlImmagine
-    }
-}
-
-export class CartaSpeciale extends Carta {
-    tipo: String;
-    constructor(tipo: String, urlImmagine: String) {
-        super(urlImmagine);
-        this.tipo = tipo
-
-    }
-}
-
-export class CartaColorata extends Carta {
-    colore: String;
-    constructor(colore: String, urlImmagine: String) {
-        super(urlImmagine)
-        this.colore = colore
-    }
-}
-
-export class CartaColorataNonNumerata extends CartaColorata {
-    tipo: String;
-    constructor(tipo: String, colore: String, urlImmagine: String) {
-        super(colore, urlImmagine);
-        this.tipo = tipo
-    }
-
-}
-
-export class CartaColorataNumerata extends CartaColorata {
-    numero: Number;
-    constructor(numero: Number, colore: String, urlImmagine: String) {
-        super(colore, urlImmagine)
-        this.numero = numero
     }
 }
 
@@ -46,19 +21,16 @@ export class GameRoom {
     id: String;
     players: String[];
     status: String;
+    deck: Carta[];
+    playedCards: Carta[];
+    playersCards: Map<String, Carta[]>;
 
     constructor(id: String, players: String[], status: String) {
         this.id = id;
         this.players = players;
         this.status = status;
+        this.playedCards = [];
+        this.playersCards = new Map<String, Carta[]>();
+        this.deck = shuffleDeck(generateDeck());
     }
-
-    toJsonObject() {
-        return {
-            id: this.id,
-            players: this.players,
-            status: this.status
-        }
-    }
-
 }
