@@ -1,7 +1,7 @@
 const dialog = document.getElementById("myDialog");
 const cartaCentrale = document.getElementById("cartacentrale");
 let chosenColor = null;
-let carteGiocatore = document.getElementById("cartegiocatore");
+let carteGiocatore = document.getElementById("cartegiocatore1");
 console.log("ROOM ID:" + location.search.replace("?room=", ""));
 
 const socket = io();
@@ -42,7 +42,10 @@ socket.on("message", (event) => {
                 img.addEventListener("click", (event) => {
                     giocaCarta(img);
                 });
-                document.getElementById("cartegiocatore").appendChild(img);
+                document.getElementById("cartegiocatore1").appendChild(img.cloneNode(true));
+                document.getElementById("cartegiocatore2").appendChild(img.cloneNode(true));
+                document.getElementById("cartegiocatore3").appendChild(img.cloneNode(true));
+                document.getElementById("cartegiocatore4").appendChild(img.cloneNode(true));
             });
             break;
 
@@ -62,13 +65,18 @@ socket.on("disconnect", (event) => {
 });
 
 function giocaCarta(carta) {
-    if (puoiGiocareCarta(cartaCentrale, carta)) {
-        cartaCentrale.src = carta.src;
-        cartaCentrale.setAttribute("colore", carta.getAttribute("colore"));
-        cartaCentrale.setAttribute("numero", carta.getAttribute("numero"));
-        cartaCentrale.setAttribute("tipo", carta.getAttribute("tipo"));
-        carta.remove();
+    let payload = {
+        "method": "playCard",
+        "card": {
+            "colore": carta.getAttribute("colore"),
+            "numero": parseInt(carta.getAttribute("numero")),
+            "tipo": carta.getAttribute("tipo"),
+            "urlImmagine": carta.src.replace("http://localhost:3000/", "")
+        }
     }
+    socket.send(JSON.stringify(payload), (err) => {
+        console.log(err);
+    });
 }
 function puoiGiocareCarta(cartaCentrale, cartaGiocatore) {
     if (cartaGiocatore.getAttribute("colore") != "null" && cartaGiocatore.getAttribute("colore") == cartaCentrale.getAttribute("colore")) {

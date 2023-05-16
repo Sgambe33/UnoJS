@@ -71,16 +71,36 @@ io.on('connection', (socket: any) => {
             let room = gameRooms.find((room) => room.players.includes(socket.id));
 
             if(room){
-                console.log("Sending cards to player "+socket.id + " in room "+room.id);
+
                 let cards = room.deck.splice(0, 7);
+                console.log("Sending "+ cards.length +" cards to player "+socket.id + " in room "+room.id);
                 let payload = {
                     "method": "setPlayerCards",
                     "cards": cards
                 }
                 socket.send(JSON.stringify(payload));
+                room.playersCards.set(socket.id, cards);
             }
             break;
+        case "playCard":
+            let roomToPlay = gameRooms.find((room) => room.players.includes(socket.id));
+            let playedCard = new Carta(decodedMsg.card.tipo, decodedMsg.card.colore, decodedMsg.card.urlImmagine, decodedMsg.card.numero);
+            let playerHasPlayedCard: boolean = roomToPlay.playersCards.get(socket.id).some((card) => {
+                return card.tipo == playedCard.tipo && card.colore == playedCard.colore && card.numero == playedCard.numero;
+            });
 
+            console.log(roomToPlay.playersCards.get(socket.id).length);
+
+            if(playerHasPlayedCard) {
+                console.log("A user played a card in room "+roomToPlay.id);
+                console.log(roomToPlay.playedCards[roomToPlay.playedCards.length-1]);
+                if(canCardBePlayed(playedCard, roomToPlay.playedCards[roomToPlay.playedCards.length-1])) {
+                    console.log("A user played a valid card");
+                }
+            } else {
+                console.log("LISTEN HERE YOU LITTLE SHIT, DON'T CHEAT")
+            }
+            break;
 
 
 
@@ -88,7 +108,15 @@ io.on('connection', (socket: any) => {
         console.log(decodedMsg);
     }
   });
-
+  function canCardBePlayed(card: Carta, centralCard: Carta): boolean{
+      if (card.colore != "null" && card.colore == centralCard.colore) {
+          return true;
+      } else if (card.numero != -1 && card.numero == centralCard.numero) {
+          return true;
+      } else if (card.tipo != "standard" && card.tipo == centralCard.tipo) {
+          return true;
+      } else return card.colore == "null";
+  }
   socket.on("disconnect", () => {
     //Search the user in every room
     gameRooms.forEach((room) => {
@@ -96,10 +124,10 @@ io.on('connection', (socket: any) => {
         if(room.players.includes(socket.id)){
             room.players.splice(room.players.indexOf(socket.id), 1);
             console.log("A user disconnected from room "+room.id);
-            if(room.players.length == 0){
-              gameRooms.splice(gameRooms.indexOf(room), 1);
-              console.log("Empty room deleted (room "+room.id+")");
-            }
+            // if(room.players.length == 0){
+            //   gameRooms.splice(gameRooms.indexOf(room), 1);
+            //   console.log("Empty room deleted (room "+room.id+")");
+            // } Commented for testing purposes
             return;
         }
     });

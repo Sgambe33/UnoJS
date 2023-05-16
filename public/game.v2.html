@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UnoJS</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+      /* body {
+        background-color: black;
+        overflow: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+      }
+      #cartegiocatore1 {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+      #cartegiocatore2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        rotate: 180deg;
+      }
+      #cartegiocatore3 {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        rotate: 90deg;
+      }
+      #cartegiocatore4 {
+        position: relative;
+        top: 50;
+        left: 0;
+        bottom: 50;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        rotate: -90deg;
+      }
+      
+      
+      #mazzo,
+      #div-cartacentrale {
+        padding: 10px;
+      } */
+      img {
+        display: inline-block;
+        height: 200px;
+      }
+      .rest {
+        margin-left: -70px;
+      }
+      .angry-grid {
+        display: grid;
+
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+
+        gap: 0px;
+        height: 100%;
+      }
+
+      #item-0 {
+        background-color: #6678ee;
+        grid-row-start: 1;
+        grid-column-start: 1;
+
+        grid-row-end: 4;
+        grid-column-end: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        rotate: 90deg;
+      }
+      #item-1 {
+        background-color: #5795b7;
+        grid-row-start: 1;
+        grid-column-start: 2;
+
+        grid-row-end: 2;
+        grid-column-end: 5;
+        display: flex;
+        justify-content: center;
+        
+      }
+      #item-2 {
+        background-color: #cd56f5;
+        grid-row-start: 1;
+        grid-column-start: 5;
+
+        grid-row-end: 4;
+        grid-column-end: 6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        rotate: -90deg;
+      }
+      #item-3 {
+        background-color: #9ddeb7;
+        grid-row-start: 3;
+        grid-column-start: 2;
+
+        grid-row-end: 4;
+        grid-column-end: 5;
+        display: flex;
+        justify-content: center;
+      }
+      #item-4 {
+        background-color: #7f8d7e;
+        grid-row-start: 2;
+        grid-column-start: 2;
+
+        grid-row-end: 3;
+        grid-column-end: 5;
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Center card -->
+    <!-- <div id="mazzo">
+      <img src="../cards_images/back.png" />
+    </div>
+    <div id="div-cartacentrale">
+      <img id="cartacentrale" src="../cards_images/back.png" />
+    </div>
+    <div id="cartegiocatore1">
+      <img src="../cards_images/back.png"/>
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      
+    </div>
+    <div id="cartegiocatore2">
+      <img src="../cards_images/back.png"/>
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+    </div>
+    <div id="cartegiocatore3">
+      <img src="../cards_images/back.png"/>
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+    </div>
+    <div id="cartegiocatore4">
+      <img src="../cards_images/back.png"/>
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+      <img src="../cards_images/back.png" class="rest" />
+    </div> -->
+
+    <div class="angry-grid">
+      <div id="item-0">
+        <img src="../cards_images/back.png" />
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+
+      </div>
+      <div id="item-1">
+        <img src="../cards_images/back.png" />
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+      </div>
+      <div id="item-2">
+        <img src="../cards_images/back.png" />
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+      </div>
+      <div id="item-3">
+        <img src="../cards_images/back.png" />
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+        <img src="../cards_images/back.png" class="rest"/>
+      </div>
+      <div id="item-4">
+        <img src="../cards_images/back.png" />
+        <img src="../cards_images/back.png" />
+      </div>
+    </div>
+    <script src="./game.js"></script>
+  </body>
+</html>
